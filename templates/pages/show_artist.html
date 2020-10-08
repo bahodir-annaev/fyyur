@@ -10,7 +10,7 @@
 			ID: {{ artist.id }}
 		</p>
 		<div class="genres">
-			{% for genre in artist.genres %}
+			{% for genre in artist.genres.split(',') %}
 			<span class="genre">{{ genre }}</span>
 			{% endfor %}
 		</div>
@@ -49,9 +49,9 @@
 		{%for show in artist.upcoming_shows %}
 		<div class="col-sm-4">
 			<div class="tile tile-show">
-				<img src="{{ show.venue_image_link }}" alt="Show Venue Image" />
-				<h5><a href="/venues/{{ show.venue_id }}">{{ show.venue_name }}</a></h5>
-				<h6>{{ show.start_time|datetime('full') }}</h6>
+				<img src="{{ show.venue.image_link }}" alt="Show Venue Image" />
+				<h5><a href="/venues/{{ show.venue_id }}">{{ show.venue.name }}</a></h5>
+				<h6>{{ show.start_time.isoformat()|datetime('full') }}</h6>
 			</div>
 		</div>
 		{% endfor %}
@@ -63,14 +63,37 @@
 		{%for show in artist.past_shows %}
 		<div class="col-sm-4">
 			<div class="tile tile-show">
-				<img src="{{ show.venue_image_link }}" alt="Show Venue Image" />
-				<h5><a href="/venues/{{ show.venue_id }}">{{ show.venue_name }}</a></h5>
-				<h6>{{ show.start_time|datetime('full') }}</h6>
+				<img src="{{ show.venue.image_link }}" alt="Show Venue Image" />
+				<h5><a href="/venues/{{ show.venue_id }}">{{ show.venue.name }}</a></h5>
+				<h6>{{ show.start_time.isoformat()|datetime('full') }}</h6>
 			</div>
 		</div>
 		{% endfor %}
 	</div>
 </section>
-
+<section>
+  <div class="row">
+    <div class="col-sm-4">
+      <input type="button" onclick="window.location.href='/artists/{{artist.id}}/edit'" value="Edit Artist" class="btn btn-primary btn-lg btn-block">
+    </div>
+    <div class="col-sm-4">
+        <input type="button" onclick="deleteArtist()" value="Delete Artist" class="btn btn-danger btn-lg btn-block">
+    </div>    
+  </div>
+</section>
+<script>
+  function deleteArtist(){
+    if(confirm('Do you really want to delete this venue? All shows related to it will be deleted as well.')){
+      fetch('/artists/{{artist.id}}', {method: 'DELETE'})
+      .then(response => {
+        if(response.status != 200 || response.status != 302){
+          window.location.reload()
+        }else{
+          window.location.href = response.url
+        }
+      })
+    }
+  }
+</script>
 {% endblock %}
 

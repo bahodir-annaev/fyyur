@@ -10,7 +10,7 @@
 			ID: {{ venue.id }}
 		</p>
 		<div class="genres">
-			{% for genre in venue.genres %}
+			{% for genre in venue.genres.split(',') %}
 			<span class="genre">{{ genre }}</span>
 			{% endfor %}
 		</div>
@@ -43,7 +43,7 @@
 		{% endif %}
 	</div>
 	<div class="col-sm-6">
-		<img src="{{ venue.image_link }}" alt="Venue Image" />
+    <img src="{{ venue.image_link }}" alt="Venue Image" />
 	</div>
 </div>
 <section>
@@ -52,9 +52,9 @@
 		{%for show in venue.upcoming_shows %}
 		<div class="col-sm-4">
 			<div class="tile tile-show">
-				<img src="{{ show.artist_image_link }}" alt="Show Artist Image" />
-				<h5><a href="/artists/{{ show.artist_id }}">{{ show.artist_name }}</a></h5>
-				<h6>{{ show.start_time|datetime('full') }}</h6>
+				<img src="{{ show.artist.image_link }}" alt="Show Artist Image" />
+				<h5><a href="/artists/{{ show.artist_id }}">{{ show.artist.name }}</a></h5>
+				<h6>{{ show.start_time.isoformat()|datetime('full') }}</h6>
 			</div>
 		</div>
 		{% endfor %}
@@ -66,14 +66,37 @@
 		{%for show in venue.past_shows %}
 		<div class="col-sm-4">
 			<div class="tile tile-show">
-				<img src="{{ show.artist_image_link }}" alt="Show Artist Image" />
-				<h5><a href="/artists/{{ show.artist_id }}">{{ show.artist_name }}</a></h5>
-				<h6>{{ show.start_time|datetime('full') }}</h6>
+				<img src="{{ show.artist.image_link }}" alt="Show Artist Image" />
+				<h5><a href="/artists/{{ show.artist_id }}">{{ show.artist.name }}</a></h5>
+				<h6>{{ show.start_time.isoformat()|datetime('full') }}</h6>
 			</div>
 		</div>
 		{% endfor %}
-	</div>
+  </div>
 </section>
-
+<section>
+  <div class="row">
+    <div class="col-sm-4">
+      <input type="button" onclick="window.location.href='/venues/{{venue.id}}/edit'" value="Edit Venue" class="btn btn-primary btn-lg btn-block">
+    </div>
+    <div class="col-sm-4">
+        <input type="button" onclick="deleteVenue()" value="Delete Venue" class="btn btn-danger btn-lg btn-block">
+    </div>    
+  </div>
+</section>
+<script>
+  function deleteVenue(){
+    if(confirm('Do you really want to delete this venue? All shows related to it will be deleted as well.')){
+      fetch('/venues/{{venue.id}}', {method: 'DELETE'})
+      .then(response => {
+        if(response.status != 200 || response.status != 302){
+          window.location.reload()
+        }else{
+          window.location.href = response.url
+        }
+      })
+    }
+  }
+</script>
 {% endblock %}
 
